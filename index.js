@@ -7,7 +7,16 @@ const port = process.env.PORT || 5000
 
 
 // middleware
-app.use(cors())
+app.use(cors(
+
+  {
+    origin: ["http://localhost:5173"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    withCredentials: true,
+  }
+
+))
+
 app.use(express.json())
 
 // coffeeSotre
@@ -28,7 +37,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+
 
     const coffeeCollection = client.db('coffeeDB').collection('coffee');
     const userCollection = client.db('userDB').collection('user');
@@ -100,13 +109,13 @@ async function run() {
       const user = req.body;
       const filter = { email: user.email }
       const updateDoc = {
-          $set: {
-              lastLoggedAt: user.lastLoggedAt
-          }
+        $set: {
+          lastLoggedAt: user.lastLoggedAt
+        }
       }
       const result = await userCollection.updateOne(filter, updateDoc);
       res.send(result);
-  })
+    })
 
     app.delete('/users/:id', async (req, res) => {
       const id = req.params.id;
@@ -120,7 +129,7 @@ async function run() {
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
